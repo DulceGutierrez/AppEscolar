@@ -15,11 +15,15 @@ import { RegistroAlumnosComponent } from './partials/registro-alumnos/registro-a
 import { RegistroMaestrosComponent } from './partials/registro-maestros/registro-maestros.component';
 
 //Angular Material
-import {MatCardModule} from '@angular/material/card';
-import {MatIconModule} from '@angular/material/icon';
-import {MatRadioModule} from '@angular/material/radio';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 //Ngx-cookie-service
 import { CookieService } from 'ngx-cookie-service';
@@ -49,6 +53,10 @@ import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
     MatRadioModule,
     MatFormFieldModule,
     MatInputModule,
+  MatDatepickerModule,
+  MatNativeDateModule,
+  MatSelectModule,
+  MatCheckboxModule,
     NgxMaskDirective
   ],
   providers: [

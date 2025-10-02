@@ -1,1 +1,114 @@
-<p>registro-maestros works!</p>
+<div class="wrapper">
+	<div class="section-registro">
+		<div class="body-registro">
+			<div class="row mt-3 mb-3">
+				<div class="form-group col-12">
+					<label class="title-user" for="tipo_usuario">Ingresa los datos del maestro</label>
+				</div>
+			</div>
+			<!-- Campos del formulario -->
+					<mat-form-field class="mat-input" appearance="outline">
+						<mat-label>ID de trabajador</mat-label>
+						<input matInput [(ngModel)]="maestro.clave_maestro" name="id" placeholder="Escribe ID de trabajador">
+					</mat-form-field>
+					<div *ngIf="errors.clave_maestro" class="invalid-feedback">{{ errors.clave_maestro }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline">
+						<mat-label>Nombre</mat-label>
+						<input matInput [(ngModel)]="maestro.first_name" placeholder="Escribe nombre" (keypress)="soloLetras($event)">
+					</mat-form-field>
+					<div *ngIf="errors.first_name" class="invalid-feedback">{{ errors.first_name }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline">
+						<mat-label>Apellidos</mat-label>
+						<input matInput [(ngModel)]="maestro.last_name" placeholder="Escribe apellidos" (keypress)="soloLetras($event)">
+					</mat-form-field>
+					<div *ngIf="errors.last_name" class="invalid-feedback">{{ errors.last_name }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline">
+						<mat-label>Correo electrónico</mat-label>
+						<input matInput [(ngModel)]="maestro.email" placeholder="Escribe correo electrónico" [disabled]="editar">
+					</mat-form-field>
+					<div *ngIf="errors.email" class="invalid-feedback">{{ errors.email }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline" *ngIf="!editar">
+						<mat-label>Contraseña</mat-label>
+						<input matInput [(ngModel)]="maestro.password" type="{{ inputType_1 }}" placeholder="Escribe contraseña">
+						<mat-icon matSuffix class="eye-icon" (click)="showPassword()">{{hide_1 ? 'visibility_off' : 'visibility'}}</mat-icon>
+					</mat-form-field>
+					<div *ngIf="errors.password" class="invalid-feedback">{{ errors.password }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline" *ngIf="!editar">
+						<mat-label>Confirmar contraseña</mat-label>
+						<input matInput [(ngModel)]="maestro.confirmar_password" type="{{ inputType_2 }}" placeholder="Confirma la contraseña">
+						<mat-icon matSuffix class="eye-icon" (click)="showPwdConfirmar()">{{hide_2 ? 'visibility_off' : 'visibility'}}</mat-icon>
+					</mat-form-field>
+					<div *ngIf="errors.confirmar_password" class="invalid-feedback">{{ errors.confirmar_password }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline">
+						<mat-label>Fecha de nacimiento</mat-label>
+						<input matInput [(ngModel)]="maestro.fecha_nacimiento" [matDatepicker]="picker" placeholder="Selecciona la fecha de nacimiento">
+						<mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+						<mat-datepicker #picker></mat-datepicker>
+					</mat-form-field>
+					<div *ngIf="errors.fecha_nacimiento" class="invalid-feedback">{{ errors.fecha_nacimiento }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline">
+						<mat-label>Teléfono</mat-label>
+						<input matInput [(ngModel)]="maestro.telefono" mask='(000) 000-0000' placeholder="Escribe teléfono">
+					</mat-form-field>
+					<div *ngIf="errors.telefono" class="invalid-feedback">{{ errors.telefono }}</div>
+
+					<mat-form-field class="mat-input mat-hint-margin" appearance="outline">
+						<mat-label>RFC</mat-label>
+						<input matInput minlength="12" maxlength="13" [(ngModel)]="maestro.rfc" placeholder="Escribe RFC" style="text-transform: uppercase;">
+						<mat-hint align="end">{{maestro.rfc?.length || 0}}/13</mat-hint>
+					</mat-form-field>
+					<div *ngIf="errors.rfc" class="invalid-feedback">{{ errors.rfc }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline">
+						<mat-label>Cubículo</mat-label>
+						<input matInput [(ngModel)]="maestro.cubiculo" placeholder="Escribe el cubículo">
+					</mat-form-field>
+					<div *ngIf="errors.cubiculo" class="invalid-feedback">{{ errors.cubiculo }}</div>
+
+					<mat-form-field class="mat-input" appearance="outline">
+						<mat-label>Área de investigación</mat-label>
+						<mat-select [(ngModel)]="maestro.area_investigacion" placeholder="Selecciona área de investigación">
+							<mat-option value="Inteligencia Artificial">Inteligencia Artificial</mat-option>
+							<mat-option value="Bases de Datos">Bases de Datos</mat-option>
+							<mat-option value="Redes">Redes</mat-option>
+							<mat-option value="Desarrollo Web">Desarrollo Web</mat-option>
+							<mat-option value="Minería de Datos">Minería de Datos</mat-option>
+							<mat-option value="Ingeniería de Software">Ingeniería de Software</mat-option>
+							<mat-option value="Sistemas Operativos">Sistemas Operativos</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<div *ngIf="errors.area_investigacion" class="invalid-feedback">{{ errors.area_investigacion }}</div>
+
+									<div class="mat-input" style="margin-left:5%;width:90%;">
+										<label style="font-weight:bold;display:block;margin-bottom:8px;">Selecciona las materias a impartir</label>
+										<div class="checkbox-list">
+											<mat-checkbox [checked]="maestro.materias?.includes('Aplicaciones Web')" (change)="onMateriaChange($event, 'Aplicaciones Web')">Aplicaciones Web</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Programación 1')" (change)="onMateriaChange($event, 'Programación 1')">Programación 1</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Bases de datos')" (change)="onMateriaChange($event, 'Bases de datos')">Bases de datos</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Tecnologías Web')" (change)="onMateriaChange($event, 'Tecnologías Web')">Tecnologías Web</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Minería de datos')" (change)="onMateriaChange($event, 'Minería de datos')">Minería de datos</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Desarrollo móvil')" (change)="onMateriaChange($event, 'Desarrollo móvil')">Desarrollo móvil</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Estructuras de datos')" (change)="onMateriaChange($event, 'Estructuras de datos')">Estructuras de datos</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Administración de redes')" (change)="onMateriaChange($event, 'Administración de redes')">Administración de redes</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Ingeniería de Software')" (change)="onMateriaChange($event, 'Ingeniería de Software')">Ingeniería de Software</mat-checkbox><br>
+											<mat-checkbox [checked]="maestro.materias?.includes('Administración de S.O.')" (change)="onMateriaChange($event, 'Administración de S.O.')">Administración de S.O.</mat-checkbox>
+										</div>
+									</div>
+									<div *ngIf="errors.materias" class="invalid-feedback">{{ errors.materias }}</div>
+
+			<!-- Botones -->
+			<div class="section-buttons">
+				<button class="btn btn-danger" (click)="regresar()">Cancelar</button>
+				<button *ngIf="!editar" class="btn btn-primary" type="submit" (click)="registrar()">Registrar</button>
+				<button *ngIf="editar" class="btn btn-primary" type="submit" (click)="actualizar()">Actualizar</button>
+			</div>
+		</div>
+	</div>
+</div>
