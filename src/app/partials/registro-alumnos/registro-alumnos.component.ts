@@ -1,0 +1,148 @@
+import { Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FacadeService } from 'src/app/services/facade.service';
+import { Location } from '@angular/common';
+import { AdministradoresService } from 'src/app/services/administradores.service';
+import { AlumnosService } from 'src/app/services/alumnos.service';
+
+
+@Component({
+  selector: 'app-registro-alumnos',
+  templateUrl: './registro-alumnos.component.html',
+  styleUrls: ['./registro-alumnos.component.scss']
+})
+export class RegistroAlumnosComponent implements OnInit {
+
+  @Input() rol: string = "";
+  @Input() datos_user: any = {};
+
+  public alumno:any = {};
+  public errors:any = {};
+  public editar:boolean = false;
+  public token: string = "";
+  public idUser: Number = 0;
+
+  //Para contraseñas
+  public hide_1: boolean = false;
+  public hide_2: boolean = false;
+  public inputType_1: string = 'password';
+  public inputType_2: string = 'password';
+
+  constructor(
+    private location: Location,
+    public activatedRoute: ActivatedRoute,
+    private alumnosService: AlumnosService,
+    private facadeService: FacadeService,
+    private router: Router
+  ) { }
+
+  ngOnInit(): void {
+     //El primer if valida si existe un  parametro en la url
+    if(this.activatedRoute.snapshot.params['id']){
+      this.editar = true;
+      //Asignamos a nuestra variable global el valor del ID que viene enla url
+      this.idUser = this.activatedRoute.snapshot.params['id'];
+      //Al iniciar la vista asignamos los datos del usuario
+      this.alumno = this.datos_user;
+    }else{
+      this.alumno= this.alumnosService.esquemaAlumno();
+      this.alumno.rol = this.rol;
+      this.token = this.facadeService.getSessionToken();
+    }
+
+    //imprimir los datos en consola
+    console.log("Alumno: ", this.alumno);
+  }
+
+  public regresar(){
+    this.location.back();
+  }
+
+  //Funciones para password
+  public showPassword()
+  {
+    if(this.inputType_1 == 'password'){
+      this.inputType_1 = 'text';
+      this.hide_1 = true;
+    }
+    else{
+      this.inputType_1 = 'password';
+      this.hide_1 = false;
+    }
+  }
+
+  public showPwdConfirmar()
+  {
+    if(this.inputType_2 == 'password'){
+      this.inputType_2 = 'text';
+      this.hide_2 = true;
+    }
+    else{
+      this.inputType_2 = 'password';
+      this.hide_2 = false;
+    }
+  }
+
+  public changeFecha(event :any){
+    console.log(event);
+    console.log(event.value.toISOString());
+
+    this.alumno.fecha_nacimiento = event.value.toISOString().split("T")[0];
+    console.log("Fecha: ", this.alumno.fecha_nacimiento);
+  }
+
+  public registrar(){
+    this.errors = {};
+    this.errors = this.alumnosService.validarAlumno(this.alumno, this.editar);
+    if(Object.keys(this.errors).length > 0){
+      return false;
+    }
+
+    //Validar si las contraseñas coinciden
+    if(this.alumno.password != this.alumno.confirmar_password){
+      alert("Las contraseñas no coinciden");
+      return false;
+    }
+
+    this.alumnosService.registrarAlumno(this.alumno).subscribe({
+
+      next: (response) => {
+        alert("Alumno registrado con éxito");
+        console.log("Alumno registrado", response);
+
+        //Validar si se registro entonces navega a la lista de Alumno
+        if(this.token != ""){
+          this.router.navigate(['alumno']);
+        }else{
+          this.router.navigate(['/']);
+        }
+
+      },
+      error: (error) => {
+        if(error.status == 400){
+          this.errors = error.error.errors;
+        }else{
+          alert("Error al registrar el Alumno");
+        }
+      }
+    })
+
+  }
+
+  public actualizar(){
+
+  }
+
+  // Función para los campos solo de datos alfabeticos
+  public soloLetras(event: KeyboardEvent) {
+    const charCode = event.key.charCodeAt(0);
+    // Permitir solo letras (mayúsculas y minúsculas) y espacio
+    if (
+      !(charCode >= 65 && charCode <= 90) &&  // Letras mayúsculas
+      !(charCode >= 97 && charCode <= 122) && // Letras minúsculas
+      charCode !== 32                         // Espacio
+    ) {
+      event.preventDefault();
+    }
+  }
+}

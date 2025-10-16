@@ -1,0 +1,197 @@
+import { Component, Input, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
+import { AdministradoresService } from 'src/app/services/administradores.service';
+import { MaestrosService } from '../../services/maestros.service';
+import { FacadeService } from '../../services/facade.service';
+
+@Component({
+  selector: 'app-registro-maestros',
+  templateUrl: './registro-maestros.component.html',
+  styleUrls: ['./registro-maestros.component.scss']
+})
+export class RegistroMaestrosComponent implements OnInit {
+
+  @Input() rol: string = "";
+  @Input() datos_user: any = {};
+
+  public maestro: any = {};
+  public errors:any = {};
+  public editar:boolean = false;
+  public token: string = "";
+  public idUser: Number = 0;
+
+  //Para el select
+  public areas: any[] = [
+    {value: '1', viewValue: 'Desarrollo Web'},
+    {value: '2', viewValue: 'Programación'},
+    {value: '3', viewValue: 'Bases de datos'},
+    {value: '4', viewValue: 'Redes'},
+    {value: '5', viewValue: 'Matemáticas'},
+  ];
+
+  public materias:any[] = [
+    {value: '1', nombre: 'Aplicaciones Web'},
+    {value: '2', nombre: 'Programacion 1'},
+    {value: '3', nombre: 'Bases de datos'},
+    {value: '4', nombre: 'Tecnologías Web'},
+    {value: '5', nombre: 'Minería de datos'},
+    {value: '6', nombre: 'Desarrollo móvil'},
+    {value: '7', nombre: 'Estructuras de datos'},
+    {value: '8', nombre: 'Administracion de redes'},
+    {value: '9', nombre: 'Ingenieria de Software'},
+    {value: '10', nombre: 'Administracion de S.O.'},
+  ];
+
+  //Para contraseñas
+  public hide_1: boolean = false;
+  public hide_2: boolean = false;
+  public inputType_1: string = 'password';
+  public inputType_2: string = 'password';
+
+  constructor(
+    private location: Location,
+    public activatedRoute: ActivatedRoute,
+    private maestrosService: MaestrosService,
+    private router: Router,
+    private FacadeService: FacadeService
+  ) { }
+
+  ngOnInit(): void {
+     //El primer if valida si existe un  parametro en la url
+    if(this.activatedRoute.snapshot.params['id']){
+      this.editar = true;
+      //Asignamos a nuestra variable global el valor del ID que viene enla url
+      this.idUser = this.activatedRoute.snapshot.params['id'];
+      //Al iniciar la vista asignamos los datos del usuario
+      this.maestro = this.datos_user;
+    }else{
+      this.maestro= this.maestrosService.esquemaMaestro();
+      this.maestro.rol = this.rol;
+      this.token = this.FacadeService.getSessionToken();
+    }
+
+    //imprimir los datos en consola
+    console.log("Maestro: ", this.maestro);
+  }
+
+  public regresar(){
+    this.location.back();
+  }
+
+  //Funciones para password
+  public showPassword()
+  {
+    if(this.inputType_1 == 'password'){
+      this.inputType_1 = 'text';
+      this.hide_1 = true;
+    }
+    else{
+      this.inputType_1 = 'password';
+      this.hide_1 = false;
+    }
+  }
+
+  public showPwdConfirmar()
+  {
+    if(this.inputType_2 == 'password'){
+      this.inputType_2 = 'text';
+      this.hide_2 = true;
+    }
+    else{
+      this.inputType_2 = 'password';
+      this.hide_2 = false;
+    }
+  }
+
+  //Función para detectar el cambio de fecha
+  public changeFecha(event :any){
+    console.log(event);
+    console.log(event.value.toISOString());
+
+    this.maestro.fecha_nacimiento = event.value.toISOString().split("T")[0];
+    console.log("Fecha: ", this.maestro.fecha_nacimiento);
+  }
+
+  // Funciones para los checkbox
+  public checkboxChange(event:any){
+    console.log("Evento: ", event);
+    if(event.checked){
+      this.maestro.materias_json.push(event.source.value)
+    }else{
+      console.log(event.source.value);
+      this.maestro.materias_json.forEach((materia, i) => {
+        if(materia == event.source.value){
+          this.maestro.materias_json.splice(i,1)
+        }
+      });
+    }
+    console.log("Array materias: ", this.maestro);
+  }
+
+  public revisarSeleccion(nombre: string){
+    if(this.maestro.materias_json){
+      var busqueda = this.maestro.materias_json.find((element)=>element==nombre);
+      if(busqueda != undefined){
+        return true;
+      }else{
+        return false;
+      }
+    }else{
+      return false;
+    }
+  }
+
+  public registrar(){
+    this.errors = {};
+    this.errors = this.maestrosService.validarMaestro(this.maestro, this.editar);
+    if(Object.keys(this.errors).length > 0){
+      return false;
+    }
+    //Validar si las contraseñas coinciden
+    if(this.maestro.password != this.maestro.confirmar_password){
+      alert("Las contraseñas no coinciden");
+      return false;
+    }
+
+    this.maestrosService.registrarMaestro(this.maestro).subscribe({
+
+      next: (response) => {
+        alert("Maestro registrado con éxito");
+        console.log("Maestro registrado", response);
+
+        //Validar si se registro entonces navega a la lista de Alumno
+        if(this.token != ""){
+          this.router.navigate(['maestro']);
+        }else{
+          this.router.navigate(['/']);
+        }
+
+      },
+      error: (error) => {
+        if(error.status == 400){
+          this.errors = error.error.errors;
+        }else{
+          alert("Error al registrar el Maestro");
+        }
+      }
+    })
+  }
+
+  public actualizar(){
+
+  }
+
+  // Función para los campos solo de datos alfabeticos
+  public soloLetras(event: KeyboardEvent) {
+    const charCode = event.key.charCodeAt(0);
+    // Permitir solo letras (mayúsculas y minúsculas) y espacio
+    if (
+      !(charCode >= 65 && charCode <= 90) &&  // Letras mayúsculas
+      !(charCode >= 97 && charCode <= 122) && // Letras minúsculas
+      charCode !== 32                         // Espacio
+    ) {
+      event.preventDefault();
+    }
+  }
+}
