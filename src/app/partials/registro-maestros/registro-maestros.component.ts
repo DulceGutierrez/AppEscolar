@@ -11,7 +11,6 @@ import { FacadeService } from '../../services/facade.service';
   styleUrls: ['./registro-maestros.component.scss']
 })
 export class RegistroMaestrosComponent implements OnInit {
-
   @Input() rol: string = "";
   @Input() datos_user: any = {};
 

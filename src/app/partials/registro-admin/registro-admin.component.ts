@@ -4,7 +4,6 @@ import { FacadeService } from 'src/app/services/facade.service';
 import { Location } from '@angular/common';
 import { AdministradoresService } from 'src/app/services/administradores.service';
 
-
 @Component({
   selector: 'app-registro-admin',
   templateUrl: './registro-admin.component.html',

@@ -53,7 +53,6 @@ import { NavbarUserComponent } from './partials/navbar-user/navbar-user.componen
 
 
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -63,18 +62,12 @@ import { NavbarUserComponent } from './partials/navbar-user/navbar-user.componen
     DashboardLayoutComponent,
     RegistroAdminComponent,
     RegistroAlumnosComponent,
-    RegistroMaestrosComponent,
-    HomeScreenComponent,
     AlumnosScreenComponent,
     MaestrosScreenComponent,
-    AdminScreenComponent,
     SidebarComponent,
     NavbarUserComponent,
 
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
+=======
     BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
